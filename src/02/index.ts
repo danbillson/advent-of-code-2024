@@ -26,30 +26,14 @@ function part1() {
 
 function part2() {
   return reports.reduce((safe, cur) => {
-    const dir = cur[0] < cur[1] ? "inc" : "dec";
-    const mistakes = cur.reduce((m, _, i) => {
-      if (!isSafe(dir, cur[i], cur[i + 1])) {
-        m.push(i);
-        if (i === cur.length - 2) m.push(i + 1);
-      }
+    const anySafe = cur.some((_, i) => {
+      const report = [...cur];
+      report.splice(i, 1);
+      const dir = report[0] < report[1] ? "inc" : "dec";
 
-      return m;
-    }, [] as number[]);
+      return report.slice(1).every((n, i) => isSafe(dir, report[i], n));
+    });
 
-    if (mistakes.length) {
-      const s = mistakes.some((m) => {
-        const newReport = [...cur];
-        newReport.splice(m, 1);
-        const newDir = newReport[0] < newReport[1] ? "inc" : "dec";
-
-        return newReport
-          .slice(1)
-          .every((n, i) => isSafe(newDir, newReport[i], n));
-      });
-
-      return s ? safe + 1 : safe;
-    }
-
-    return safe + 1;
+    return anySafe ? safe + 1 : safe;
   }, 0);
 }
