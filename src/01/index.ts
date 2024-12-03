@@ -12,34 +12,22 @@ const { left, right } = lines.reduce(
   { left: [], right: [] } as { left: number[]; right: number[] }
 );
 
-const sortedLeft = left.sort();
-const sortedRight = right.sort();
-
 console.log("Part 1:", part1());
 console.log("Part 2:", part2());
 
 function part1() {
-  let diff = 0;
+  const sortedLeft = left.sort();
+  const sortedRight = right.sort();
 
-  for (let i = 0; i < sortedLeft.length; i++) {
-    diff += Math.abs(sortedLeft[i] - sortedRight[i]);
-  }
-
-  return diff;
+  return sortedLeft.reduce(
+    (acc, cur, i) => acc + Math.abs(cur - sortedRight[i]),
+    0
+  );
 }
 
 function part2() {
-  let similarity = 0;
-
-  for (let l of left) {
-    let occurances = 0;
-    for (let r of right) {
-      if (l === r) {
-        occurances++;
-      }
-    }
-    similarity += occurances * l;
-  }
-
-  return similarity;
+  return left.reduce((acc, cur) => {
+    const occurances = right.filter((r) => r === cur).length;
+    return acc + occurances * cur;
+  }, 0);
 }
