@@ -1,15 +1,19 @@
 # advent-of-code-2024
 
-To install dependencies:
+Welcome to my 2024 attempt of advent of code using Bun/TypeScript
 
-```bash
-bun install
+Solution files are in `src/*/index.ts`
+
+### Usage:
+
+Add problem data to `src/*/data.txt`
+
+Run the following using the relevant day:
+
+```
+bun run --hot src/01/index.ts
 ```
 
-To run:
+---
 
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.1.29. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+Happy coding
