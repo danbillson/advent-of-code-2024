@@ -52,6 +52,26 @@ function part1() {
   }, 0);
 }
 
+function crossSearch(x: number, y: number) {
+  if (x < 1 || x >= grid.length - 1 || y < 1 || y >= grid[0].length - 1)
+    return false;
+
+  const nwtose = grid[x - 1][y + 1] === "M" && grid[x + 1][y - 1] === "S";
+  const swtone = grid[x - 1][y - 1] === "M" && grid[x + 1][y + 1] === "S";
+  const setonw = grid[x + 1][y - 1] === "M" && grid[x - 1][y + 1] === "S";
+  const netosw = grid[x + 1][y + 1] === "M" && grid[x - 1][y - 1] === "S";
+
+  return (nwtose || setonw) && (swtone || netosw);
+}
+
 function part2() {
-  return null;
+  return grid.reduce((total, row, i) => {
+    return (
+      total +
+      row.reduce((lineTotal, char, j) => {
+        if (char === "A" && crossSearch(i, j)) return lineTotal + 1;
+        return lineTotal;
+      }, 0)
+    );
+  }, 0);
 }
