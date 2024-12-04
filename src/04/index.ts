@@ -30,26 +30,26 @@ function search(
 }
 
 function part1() {
-  return grid.reduce((total, row, i) => {
-    return (
-      total +
-      row.reduce((lineTotal, char, j) => {
-        if (char === "X") {
-          const n = search(i, j, 0, 1, "X", "X");
-          const s = search(i, j, 0, -1, "X", "X");
-          const e = search(i, j, 1, 0, "X", "X");
-          const w = search(i, j, -1, 0, "X", "X");
-          const ne = search(i, j, 1, 1, "X", "X");
-          const nw = search(i, j, -1, 1, "X", "X");
-          const se = search(i, j, 1, -1, "X", "X");
-          const sw = search(i, j, -1, -1, "X", "X");
+  let found = 0;
 
-          return lineTotal + n + s + e + w + ne + nw + se + sw;
-        }
-        return lineTotal;
-      }, 0)
-    );
-  }, 0);
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[0].length; j++) {
+      if (grid[i][j] === "X") {
+        const n = search(i, j, 0, 1, "X", "X");
+        const s = search(i, j, 0, -1, "X", "X");
+        const e = search(i, j, 1, 0, "X", "X");
+        const w = search(i, j, -1, 0, "X", "X");
+        const ne = search(i, j, 1, 1, "X", "X");
+        const nw = search(i, j, -1, 1, "X", "X");
+        const se = search(i, j, 1, -1, "X", "X");
+        const sw = search(i, j, -1, -1, "X", "X");
+
+        found += n + s + e + w + ne + nw + se + sw;
+      }
+    }
+  }
+
+  return found;
 }
 
 function crossSearch(x: number, y: number) {
@@ -65,13 +65,13 @@ function crossSearch(x: number, y: number) {
 }
 
 function part2() {
-  return grid.reduce((total, row, i) => {
-    return (
-      total +
-      row.reduce((lineTotal, char, j) => {
-        if (char === "A" && crossSearch(i, j)) return lineTotal + 1;
-        return lineTotal;
-      }, 0)
-    );
-  }, 0);
+  let found = 0;
+
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < grid[0].length; j++) {
+      if (grid[i][j] === "A" && crossSearch(i, j)) found++;
+    }
+  }
+
+  return found;
 }
