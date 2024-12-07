@@ -14,23 +14,21 @@ const calibrations = lines.map((line) => {
   return { target: Number(target), values };
 }) as Calibration[];
 
-const operations = ["+", "*"];
-
 console.log("Part 1:", part1());
 console.log("Part 2:", part2());
 
-function combinations(length: number) {
+function combinations(length: number, operations: string[]) {
   if (length === 1) return operations;
 
-  const prev = combinations(length - 1);
+  const prev = combinations(length - 1, operations);
   const combos = prev.flatMap((op) =>
     operations.map((o) => `${op}${o}`)
   ) as string[];
   return combos;
 }
 
-function evaluate({ target, values }: Calibration) {
-  const ops = combinations(values.length - 1);
+function evaluate({ target, values }: Calibration, operations: string[]) {
+  const ops = combinations(values.length - 1, operations);
 
   for (const opString of ops) {
     let value = values[0];
@@ -41,6 +39,7 @@ function evaluate({ target, values }: Calibration) {
 
       if (op === "+") value += next;
       if (op === "*") value *= next;
+      if (op === "|") value = Number(`${value}${next}`);
     }
 
     if (value === target) return target;
@@ -51,10 +50,12 @@ function evaluate({ target, values }: Calibration) {
 
 function part1() {
   return calibrations.reduce((acc, cur) => {
-    return acc + evaluate(cur);
+    return acc + evaluate(cur, ["+", "*"]);
   }, 0);
 }
 
 function part2() {
-  return null;
+  return calibrations.reduce((acc, cur) => {
+    return acc + evaluate(cur, ["+", "*", "|"]);
+  }, 0);
 }
