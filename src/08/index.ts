@@ -58,6 +58,50 @@ function part1() {
   }, 0);
 }
 
+function addMultinodes(
+  row: number,
+  col: number,
+  frequency: string,
+  placed: Set<string>
+) {
+  for (let i = row; i < grid.length; i++) {
+    const start = i === row ? col + 1 : 0;
+    for (let j = start; j < grid[0].length; j++) {
+      if (grid[i][j] === frequency) {
+        const dr = i - row;
+        const dc = j - col;
+
+        let nr1 = row - dr;
+        let nc1 = col - dc;
+        let nr2 = i + dr;
+        let nc2 = j + dc;
+
+        placed.add(`${row},${col}`);
+        placed.add(`${i},${j}`);
+
+        while (inBounds(nr1, nc1)) {
+          placed.add(`${nr1},${nc1}`);
+          nr1 -= dr;
+          nc1 -= dc;
+        }
+
+        while (inBounds(nr2, nc2)) {
+          placed.add(`${nr2},${nc2}`);
+          nr2 += dr;
+          nc2 += dc;
+        }
+      }
+    }
+  }
+}
+
 function part2() {
-  return null;
+  const placed = new Set<string>();
+  grid.forEach((row, r) => {
+    row.forEach((cell, c) => {
+      if (cell === ".") return;
+      addMultinodes(r, c, cell, placed);
+    });
+  });
+  return placed.size;
 }
