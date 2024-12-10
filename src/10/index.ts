@@ -80,6 +80,38 @@ function part1() {
   return starts.reduce((acc, start) => acc + travel(map, start), 0);
 }
 
+function ratingTravel(map: number[][], pos: [number, number]) {
+  let queue = [pos];
+  let trailheads = 0;
+
+  while (queue.length) {
+    const [r, c] = queue.shift() || [-1, -1];
+    const currentValue = map[r][c];
+
+    for (let dir of dirs) {
+      const [dr, dc] = move[dir];
+      const [nr, nc] = [r + dr, c + dc];
+
+      if (nr < 0 || nr >= map.length || nc < 0 || nc >= map[nr].length)
+        continue;
+
+      const nextValue = map[nr][nc];
+      if (nextValue === 9 && currentValue === 8) {
+        trailheads++;
+        continue;
+      }
+
+      if (nextValue === currentValue + 1) {
+        queue.push([nr, nc]);
+      }
+    }
+  }
+
+  return trailheads;
+}
+
 function part2() {
-  return null;
+  const starts = findStarts(map);
+
+  return starts.reduce((acc, start) => acc + ratingTravel(map, start), 0);
 }
