@@ -2,44 +2,44 @@ const path = "./src/11/data.txt";
 const file = Bun.file(path);
 
 const data = await file.text();
-const stones = data.split(" ");
+const stones = data.split(" ").map(Number);
+
+export function memoize<Args extends unknown[], Result>(
+  func: (...args: Args) => Result
+): (...args: Args) => Result {
+  const stored = new Map<string, Result>();
+
+  return (...args) => {
+    const k = JSON.stringify(args);
+    if (stored.has(k)) {
+      return stored.get(k)!;
+    }
+    const result = func(...args);
+    stored.set(k, result);
+    return result;
+  };
+}
+
+const blink = memoize((stone: number, blinks: number): number => {
+  if (blinks === 0) return 1;
+  if (stone === 0) return blink(1, blinks - 1);
+  const digits = Math.floor(Math.log10(stone)) + 1;
+  if (digits % 2 === 0) {
+    const exp = 10 ** (digits / 2);
+    const left = Math.floor(stone / exp);
+    const right = stone % exp;
+    return blink(left, blinks - 1) + blink(right, blinks - 1);
+  }
+  return blink(stone * 2024, blinks - 1);
+});
 
 console.log("Part 1:", part1());
 console.log("Part 2:", part2());
 
-function convert(stone: string) {
-  return String(Number(stone));
-}
-
-function blink(stones: string[]) {
-  let newStones = [];
-  for (let i = 0; i < stones.length; i++) {
-    let stone = stones[i];
-    if (stone === "0") {
-      newStones.push("1");
-      continue;
-    }
-
-    if (stone.length % 2 === 0) {
-      let half = stone.length / 2;
-      newStones.push(convert(stone.slice(0, half)));
-      newStones.push(convert(stone.slice(half)));
-      continue;
-    }
-
-    newStones.push(String(Number(stone) * 2024));
-  }
-  return newStones;
-}
-
 function part1() {
-  const blinkedStones = Array.from({ length: 25 }).reduce((acc) => {
-    return blink(acc as string[]);
-  }, stones) as string[];
-
-  return blinkedStones.length;
+  return stones.reduce((acc, stone) => acc + blink(stone, 25), 0);
 }
 
 function part2() {
-  return null;
+  return stones.reduce((acc, stone) => acc + blink(stone, 75), 0);
 }
