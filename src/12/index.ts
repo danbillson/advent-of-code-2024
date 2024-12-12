@@ -9,9 +9,15 @@ const move = {
   down: [1, 0],
   left: [0, -1],
   right: [0, 1],
+  "up-right": [-1, 1],
+  "down-right": [1, 1],
+  "down-left": [1, -1],
+  "up-left": [-1, -1],
 } as const;
 
 const dirs = ["up", "down", "left", "right"] as const;
+
+const diagonals = ["up-right", "down-right", "down-left", "up-left"] as const;
 
 function nextKey(key: string, map: Record<string, Set<string>>) {
   if (!map[key]) return key;
@@ -84,8 +90,66 @@ function part1() {
   }, 0);
 }
 
+function toCoord(key: string) {
+  return key.split(",").map(Number);
+}
+
+function toKey(coord: [number, number]) {
+  return coord.join(",");
+}
+
+// corners are the same as sides but easier to calculate
+function calculateCorners(region: Set<string>) {
+  let corners = 0;
+
+  for (let point of region) {
+    let adjacent = [];
+    const [r, c] = toCoord(point);
+
+    for (let dir of dirs) {
+      const [dr, dc] = move[dir];
+      const [nr, nc] = [r + dr, c + dc];
+      if (region.has(`${nr},${nc}`)) {
+        adjacent.push([nr, nc]);
+      }
+    }
+
+    // outside corners
+    if (adjacent.length === 0) corners += 4;
+    if (adjacent.length === 1) corners += 2;
+    if (adjacent.length === 2) {
+      const [[r1, c1], [r2, c2]] = adjacent;
+      if (r1 !== r2 && c1 !== c2) corners += 1;
+    }
+
+    // inside corners
+    for (let dir of diagonals) {
+      const [dr, dc] = move[dir];
+      const a = [r + dr, c] as [number, number];
+      const b = [r, c + dc] as [number, number];
+      const [nr, nc] = [r + dr, c + dc];
+      if (
+        region.has(toKey(a)) &&
+        region.has(toKey(b)) &&
+        !region.has(toKey([nr, nc]))
+      ) {
+        corners++;
+      }
+    }
+  }
+
+  return corners;
+}
+
 function part2() {
-  return null;
+  const garden = buildGardenMap(grid);
+
+  return Object.entries(garden).reduce((acc, [key, cur]) => {
+    const area = cur.size;
+    const corners = calculateCorners(cur);
+
+    return acc + area * corners;
+  }, 0);
 }
 
 console.log("Part 1:", part1());
