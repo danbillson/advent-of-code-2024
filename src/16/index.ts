@@ -77,8 +77,66 @@ function part1() {
   return travel(grid, start);
 }
 
+// Slight adaptation of `travel` to find all optimal routes
+// This took like 10 minutes to brute force
+function optimalRoutes(grid: string[][], start: Pos, score: number): State[] {
+  let optimal: State[] = [];
+  let queue: State[] = [
+    {
+      path: [start],
+      score: 0,
+      lastDirection: null,
+    },
+  ];
+
+  let seen = new Map<string, number>();
+
+  while (queue.length) {
+    queue.sort((a, b) => a.score - b.score);
+    const state = queue.shift()!;
+    if (state.score > score) continue;
+
+    const [r, c] = state.path[state.path.length - 1];
+
+    if (grid[r][c] === "E") {
+      optimal.push(state);
+      continue;
+    }
+
+    const key = `${r},${c},${state.lastDirection}`;
+    const best = seen.get(key) ?? Infinity;
+    if (state.score > best) continue;
+    seen.set(key, state.score);
+
+    for (const dir of directions) {
+      const [dr, dc] = move[dir];
+      const [nr, nc] = [r + dr, c + dc];
+
+      if (grid[nr][nc] === "#") continue;
+
+      const sd = dir === state.lastDirection ? 1 : 1001;
+      const newScore = state.score + sd;
+      if (newScore > score) continue;
+
+      queue.push({
+        path: [...state.path, [nr, nc]],
+        score: state.score + sd,
+        lastDirection: dir,
+      });
+    }
+  }
+
+  return optimal;
+}
+
 function part2() {
-  return null;
+  const start = findStart(grid);
+  const score = travel(grid, start)!;
+  const routes = optimalRoutes(grid, start, score);
+  const paths = routes.map((route) => route.path.map(([r, c]) => `${r},${c}`));
+  const coords = new Set(paths.flat());
+
+  return coords.size;
 }
 
 console.log("Part 1:", part1());
