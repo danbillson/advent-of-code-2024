@@ -50,8 +50,41 @@ function part1() {
   return a * b * c * d;
 }
 
+function moveOnce(position: Position) {
+  const nr = (position.r + position.vr + maxR) % maxR;
+  const nc = (position.c + position.vc + maxC) % maxC;
+
+  return { ...position, r: nr, c: nc };
+}
+
+function buildGrid(positions: Position[]) {
+  const grid = Array.from({ length: maxR }, () =>
+    Array.from({ length: maxC }, () => " ")
+  );
+
+  for (const { r, c } of positions) {
+    grid[r][c] = "#";
+  }
+
+  return grid;
+}
+
 function part2() {
-  return null;
+  let poss = [...positions];
+  let seconds = 0;
+
+  while (true) {
+    poss = poss.map(moveOnce);
+    seconds++;
+
+    let grid = buildGrid(poss);
+    let rows = grid.map((row) => row.join(""));
+
+    // This is just a silly naive way to find a christmas tree
+    if (rows.some((row) => row.includes("############"))) {
+      return seconds;
+    }
+  }
 }
 
 console.log("Part 1:", part1());
